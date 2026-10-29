@@ -1,99 +1,49 @@
 # 🐢 Duvardan Kaçan Kaplumbağa
 
-## Proje Hakkında
+ROS 2 Humble ve Python ile geliştirilmiş, Turtlesim ortamında duvarları algılayarak yön değiştiren otonom kaplumbağa uygulaması.
 
-Bu proje, ROS 2 Humble ve Python kullanılarak geliştirilmiş otonom bir kaplumbağa hareket kontrol uygulamasıdır.
+## Ödev Gereksinimleri
 
-Projenin amacı, Turtlesim simülasyon ortamında hareket eden bir kaplumbağanın konumunu sürekli takip ederek duvarlara yaklaştığında yön değiştirmesini sağlamaktır.
+- `turtle_duvar_py` isimli Python paketi oluşturuldu.
+- `/turtle1/pose` üzerinden kaplumbağanın X ve Y koordinatları okundu.
+- `/turtle1/cmd_vel` üzerinden hareket komutları gönderildi.
+- Kaplumbağanın otonom olarak ileri hareket etmesi sağlandı.
+- X veya Y koordinatı `1.0` altına ya da `10.0` üzerine çıktığında yön değiştirmesi sağlandı.
+- Duvar algılandığında `get_logger().info()` ile terminale uyarı yazdırıldı.
 
-Uygulama, ROS 2'nin publisher/subscriber haberleşme yapısını ve parametre yönetimini kullanmaktadır.
-
-## 1. Ödev Gereksinimleri
-
-Proje kapsamında aşağıdaki işlemler gerçekleştirilmiştir:
-
-- `turtle_duvar_py` isimli Python paketi oluşturulmuştur.
-- `/turtle1/pose` konusuna abone olunarak kaplumbağanın X ve Y koordinatları okunmuştur.
-- `/turtle1/cmd_vel` konusuna hız komutları gönderilmiştir.
-- Kaplumbağanın otonom şekilde ileri hareket etmesi sağlanmıştır.
-- X veya Y koordinatı 1.0'ın altına ya da 10.0'ın üzerine çıktığında duvar algılanmıştır.
-- Duvar algılandığında kaplumbağanın yön değiştirmesi sağlanmıştır.
-- `get_logger().info()` kullanılarak terminale duvar uyarıları yazdırılmıştır.
-
-### Bonus: ROS 2 Parametreleri
-
-Hareket hızı ve duvar sınırları ROS 2 parametreleri üzerinden değiştirilebilir.
+**Bonus:** Hareket hızı ve duvar sınırları ROS 2 parametreleriyle değiştirilebilir.
 
 | Parametre | Açıklama |
 |---|---|
-| `hiz` | Kaplumbağanın ileri hareket hızı |
-| `alt_sinir` | Duvar algılama alt sınırı |
-| `ust_sinir` | Duvar algılama üst sınırı |
+| `hiz` | İleri hareket hızı |
+| `alt_sinir` | Alt sınır |
+| `ust_sinir` | Üst sınır |
 
-## 2. Kullanılan Teknolojiler
+## Kurulum
 
-- Ubuntu
-- ROS 2 Humble
-- Python 3
-- Turtlesim
-- `rclpy`
-- `geometry_msgs`
-- `turtlesim.msg.Pose`
-
-## 3. Çalışma Mantığı
-
-Program başlatıldığında kaplumbağa ileri doğru hareket etmeye başlar.
-
-ROS 2 üzerinden kaplumbağanın konumu sürekli okunur.
-
-Kaplumbağa duvarlara yaklaştığında mevcut konumu kontrol edilir ve yön değiştirme işlemi gerçekleştirilir.
-
-Yön değiştirme tamamlandığında kaplumbağa yeniden ileri hareket eder.
-
-Bu süreç program durdurulana kadar devam eder.
-
-### Duvar Algılama Koşulu
-
-```python
-if x < 1.0 or x > 10.0 or y < 1.0 or y > 10.0:
-```
-
-Duvar algılandığında terminalde aşağıdakine benzer bir mesaj görüntülenir:
-
-```text
-[INFO] Duvara yaklasildi! x=10.05, y=5.54
-```
-
-## 4. Kurulum
-
-ROS 2 Humble kurulu Ubuntu ortamında bir çalışma alanı oluşturulur.
+Ubuntu ve ROS 2 Humble kurulu bir ortamda:
 
 ```bash
 mkdir -p ~/robotik_ws/src
 cd ~/robotik_ws/src
-```
+git clone https://github.com/aysenaokksz/turtle_duvar_py.git
 
-Proje bu çalışma alanının `src` klasörüne yerleştirilir.
-
-Ardından paket derlenir:
-
-```bash
 cd ~/robotik_ws
 source /opt/ros/humble/setup.bash
 colcon build --packages-select turtle_duvar_py --symlink-install
 source install/setup.bash
 ```
 
-## 5. Çalıştırma
+## Çalıştırma
 
-İlk terminalde Turtlesim başlatılır:
+**Terminal 1 — Turtlesim:**
 
 ```bash
 source /opt/ros/humble/setup.bash
 ros2 run turtlesim turtlesim_node
 ```
 
-İkinci terminalde proje çalıştırılır:
+**Terminal 2 — Kaplumbağa kontrolü:**
 
 ```bash
 source /opt/ros/humble/setup.bash
@@ -101,57 +51,27 @@ source ~/robotik_ws/install/setup.bash
 ros2 run turtle_duvar_py duvar_kac
 ```
 
-### Parametrelerle Çalıştırma
-
-Hız ve sınır değerleri aşağıdaki gibi değiştirilebilir:
+**Bonus — Parametrelerle çalıştırma:**
 
 ```bash
 ros2 run turtle_duvar_py duvar_kac --ros-args -p hiz:=2.0 -p alt_sinir:=2.0 -p ust_sinir:=9.0
 ```
 
-### Parametreleri Kontrol Etme
+## Ekran Görüntüleri
 
-```bash
-ros2 param list /duvar_kac
-```
+**1. Duvar algılama ve otonom hareket**
 
-```bash
-ros2 param get /duvar_kac hiz
-ros2 param get /duvar_kac alt_sinir
-ros2 param get /duvar_kac ust_sinir
-```
+![Kaplumbağanın duvar algılayarak hareket etmesi](images/duvar_algilama.png)
 
-## 6. Test Sonuçları
+**2. ROS 2 parametrelerinin kontrolü**
 
-Uygulama Turtlesim üzerinde test edilmiştir.
+![ROS 2 parametrelerinin terminal üzerinden kontrolü](images/parametre_kontrol.png)
 
-Testler sırasında:
+## Proje Dosyaları
 
-- Kaplumbağanın ileri hareket ettiği,
-- Duvarlara yaklaştığında yön değiştirdiği,
-- Duvar algılama mesajlarının terminalde görüntülendiği,
-- ROS 2 parametrelerinin başarıyla okunduğu
+- `turtle_duvar_py/duvar_kac.py` — Hareket ve duvar algılama kodu
+- `setup.py` — ROS 2 çalıştırılabilir dosya tanımı
+- `package.xml` — Paket bağımlılıkları
+- `images/` — Test ekran görüntüleri
 
-gözlemlenmiştir.
-
-## 7. Ekran Görüntüleri
-
-Projenin çalışmasına ait ekran görüntüleri `images/` klasöründe paylaşılacaktır.
-
-## 8. Proje Dosyaları
-
-```text
-turtle_duvar_py/
-├── turtle_duvar_py/
-│   ├── __init__.py
-│   └── duvar_kac.py
-├── resource/
-├── test/
-├── package.xml
-├── setup.py
-├── setup.cfg
-├── README.md
-└── images/
-```
-
-`build/`, `install/` ve `log/` klasörleri derleme çıktıları olduğu için teslim paketine dahil edilmez.
+**Not:** `build/`, `install/` ve `log/` klasörleri derleme çıktısı olduğu için depoya eklenmemiştir.
